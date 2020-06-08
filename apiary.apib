@@ -1,61 +1,63 @@
 FORMAT: 1A
-HOST: https://team-silver.org/
 
-# Team-Silver
+# Invitation Service
 
-This is a simple micro-service for inviting other people to a 'team'.
+This is an API micro service for inviting other people to a team.
 
-
-# Usage:
-This API has two endpoints namely:
-- `/invite/send` - uses `POST` request, Requires `email` and `name`. Returns `json` with `message` field.
-
-- `/invite/verify` -uses `POST` request, Requires `email` and `name`. Returns `json` with `message` field.
-
-# Group Endpoints
-
-## Send  [/invite/send]
-### Recieve an Invite code [POST]
-Endpoint to enter email and recieve invitation code at email entered.
-+ Request (application/x-www-form-urlencoded)
-
-        data%5Bemail%5D=user@email.com&data%5Bname%5D=Username
-        
+# Group Invites
+## Pending Invites [/invites]
+### List pending invites [GET]
 + Response 200 (application/json)
 
         [
             {
-                
-                "message": "True"
-                
+                "name": "Mark Essien",
+                "email": "markessien@gmail.com"
             }
+            ...
         ]
+        
+
+## Send [/invites/send]
+### Send an invite [POST]
++ Request (application/json)
+
+        {
+            "name": "Mark Essien",
+            "email": "markessien@gmail.com"
+        }
++ Response 200 (application/json)
+
+        {
+                
+            "message": "We sent a one use code to markessien@gmail.com"
+        }
 
 + Response 401 (application/json)
 
         {
-            "error": "error.unauthorized"
+            "message": "invalid email"
         }
         
-## Verify  [/invite/verify]
-### Verify Invitation code [POST]
-Endpoint to verify invitation code
-+ Request (application/x-www-form-urlencoded)
+## Verify  [/invites/verify]
+### Verify an invite [POST]
 
-        data%5Bemail%5D=user@email.com&data%5Bcode%5D=1ksjd6u
++ Request (application/json)
+
+        {
+            "email": "markessien@gmail.com",
+            "code": "m123e4567-e89b"
+        }
         
 + Response 200 (application/json)
 
-        [
-            {
+        {
+                "message": "successfully verified"
                 
-                "message": "True"
-                
-            }
-        ]
+        }
 
 + Response 401 (application/json)
 
         {
-            "error": "error.unauthorized"
+            "message": "invalid code"
         }
