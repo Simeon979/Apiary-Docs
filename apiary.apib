@@ -1,0 +1,61 @@
+FORMAT: 1A
+HOST: https://team-silver.org/
+
+# Team-Silver
+
+This is a simple micro-service for inviting other people to a 'team'.
+
+
+# Usage:
+This API has two endpoints namely:
+- `/invite/send` - uses `POST` request, Requires `email` and `name`. Returns `json` with `message` field.
+
+- `/invite/verify` -uses `POST` request, Requires `email` and `name`. Returns `json` with `message` field.
+
+# Group Endpoints
+
+## Send  [/invite/send]
+### Recieve an Invitation code [POST]
+Endpoint to enter email and recieve invitation code at email entered.
++ Request (application/x-www-form-urlencoded)
+
+        data%5Bemail%5D=user@email.com&data%5Bname%5D=Username
+        
++ Response 200 (application/json)
+
+        [
+            {
+                
+                "message": "True"
+                
+            }
+        ]
+
++ Response 401 (application/json)
+
+        {
+            "error": "error.unauthorized"
+        }
+        
+## Verify  [/invite/verify]
+### Verify Invitation code [POST]
+Endpoint to verify invitation code
++ Request (application/x-www-form-urlencoded)
+
+        data%5Bemail%5D=user@email.com&data%5Bcode%5D=1ksjd6u
+        
++ Response 200 (application/json)
+
+        [
+            {
+                
+                "message": "True"
+                
+            }
+        ]
+
++ Response 401 (application/json)
+
+        {
+            "error": "error.unauthorized"
+        }
