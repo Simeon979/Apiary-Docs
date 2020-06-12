@@ -4,28 +4,110 @@ FORMAT: 1A
 
 This is an API micro service for inviting other people to a team.
 
+##  Registration [/v1/register]
+### Register a company [POST]
++ Request (application/json)
+
+        {
+            "email": "hotelsng@gmail.com",
+            "name": "Hotels NG",
+            "password": "hotelsng"
+        }
+        
++ Response 200 (application/json)
+
+        {
+            "message": "company account successfully created",
+            "companyId": 1,
+            "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiSG90ZWxzIE5HIiwiY29tcGFueUlkIjoxLCJpYXQiOjE1OTE5NjY5MjIsImV4cCI6MTU5MTk3MDUyMn0.BnBfV4DoBWo7bi6ibj_uKXDZUpQQyVggAuax-EVBBq8"
+        }
+
+## Login [/v1/login]
+### Login [POST]
++ Request (application/json)
+
+        {
+            "email": "hotelsng@gmail.com",
+            "password": "hotelsng"
+        }
+        
++ Response 200 (application/json)
+
+        {
+            "companyId": 1,
+            "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiSG90ZWxzIE5HIiwiY29tcGFueUlkIjoxLCJpYXQiOjE1OTE5NjY5MjIsImV4cCI6MTU5MTk3MDUyMn0.BnBfV4DoBWo7bi6ibj_uKXDZUpQQyVggAuax-EVBBq8"
+        }
+        
++ Response 401 (application/json)
+
+        {
+            "message": "incorrect email and password combination"
+        }
+            
+## Configure [/v1/configure]
+### Configure company settings [POST]
+Configure company settings. This settings are persisted. All settings are optional
+* If `invitationMessage` is set, it must include `?code` in the body which will be replaced with the generated invitation code.
+* If `invitationMessage` is not set, the default is 
+```plaintext
+    Hello, you have been invited to {company name}
+
+    This is your invitation code: {code}
+
+    This code can only be used once.
+
+    Welcome
+    {company name}
+```
+
++ Request (application/json)
+
+        {
+            "companyID": 1,
+            "name": "Hotels NG",
+            "invitationMessage": "Hello, you have been invited to our team. This is your invitation code: ?code",
+        }
+        
++ Response 200 (application/json)
+
+        {
+            "message": "company settings successfully updated"
+        }
+        
++ Response 400 (application/json)
+
+        {
+            "message": "empty field not allowed"
+        }
 
 # Group Invites
-## Pending Invites [/invites]
+## Pending Invites [/v1/pending]
 ### List pending invites [GET]
+List the emails of all unverified invitations
 
++ Request (application/json)
+
+        {
+            "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiSG90ZWxzIE5HIiwiY29tcGFueUlkIjoxLCJpYXQiOjE1OTE5NjY5MjIsImV4cCI6MTU5MTk3MDUyMn0.BnBfV4DoBWo7bi6ibj_uKXDZUpQQyVggAuax-EVBBq",
+            "companyId": 1
+        }
+        
 + Response 200 (application/json)
 
         [
             {
-                "name": "Mark Essien",
                 "email": "markessien@gmail.com"
             }
-            ...
         ]
         
 
-## Send [/invites/send]
+## Send [/v1/send]
 ### Send an invite [POST]
 + Request (application/json)
 
         {
-            "name": "Mark Essien",
+            "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiSG90ZWxzIE5HIiwiY29tcGFueUlkIjoxLCJpYXQiOjE1OTE5NjY5MjIsImV4cCI6MTU5MTk3MDUyMn0.BnBfV4DoBWo7bi6ibj_uKXDZUpQQyVggAuax-EVBBq",
+            "companyId": 1,
             "email": "markessien@gmail.com"
         }
 + Response 200 (application/json)
@@ -35,18 +117,20 @@ This is an API micro service for inviting other people to a team.
             "message": "We sent a one use code to markessien@gmail.com"
         }
 
-+ Response 401 (application/json)
++ Response 400 (application/json)
 
         {
-            "message": "invalid email"
+            "message": "please make sure all inputs are filled"
         }
         
-## Verify  [/invites/verify]
+## Verify  [/v1/verify]
 ### Verify an invite [POST]
 
 + Request (application/json)
 
         {
+            "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiSG90ZWxzIE5HIiwiY29tcGFueUlkIjoxLCJpYXQiOjE1OTE5NjY5MjIsImV4cCI6MTU5MTk3MDUyMn0.BnBfV4DoBWo7bi6ibj_uKXDZUpQQyVggAuax-EVBBq",
+            "companyId": 1
             "email": "markessien@gmail.com",
             "code": "m123e4567-e89b"
         }
@@ -58,8 +142,55 @@ This is an API micro service for inviting other people to a team.
                 
         }
 
-+ Response 401 (application/json)
++ Response 400 (application/json)
 
         {
-            "message": "invalid code"
+            "message": "cannot verify"
+        }
+
+        
+# Group Documentation
+## Get [/v1/documentation]
+### Get documentation [GET]
+
++ Response 200 (application/json)
+
+        {
+            "swagger": "2.0",
+            "info": {
+                "title": "Invitation Service",
+                "version": "",
+                "description": "This is an API micro service for inviting other people to a team."
+            },
+            "paths": {
+                "/invites": {
+                    "get": {
+                        "responses": {
+                            "200": {
+                                "description": "OK",
+                                "headers": {},
+                                "examples": {}
+                            }
+                        },
+                        "summary": "List pending invites",
+                        "operationId": "List pending invites",
+                        "description": "",
+                        "tags": [
+                            "Invites"
+                        ],
+                        "parameters": []
+                    }
+                }
+            },
+            "definitions": {
+                "Pending Invites": {},
+                "Send": {},
+                "Verify": {}
+            },
+            "securityDefinitions": {},
+            "tags": [
+                {
+                    "name": "Invites"
+                }
+            ]
         }
